@@ -19,11 +19,11 @@ Add the following to your `Cargo.toml` file:
 ```toml
 [dependencies]
 sqrtx = "0.1.2"
+```
 
 #### 5. **Usage**
 
-**Example:**
-```markdown
+
 ## Usage
 
 ### Synchronous Example
@@ -34,6 +34,7 @@ fn main() {
     let result = square_root(144.0).unwrap();
     println!("The square root is {}", result);
 }
+```
 
 ### Asynchronous Example
 ```rust
@@ -44,6 +45,7 @@ async fn main() {
     let result = square_root_async(144.0).await.unwrap();
     println!("The square root is {}", result);
 }
+```
 
 
 
@@ -70,7 +72,7 @@ async fn main() {
     let results = square_roots_parallel(numbers).await.unwrap();
     println!("The square roots are: {:?}", results);
 }
-
+```
 
 ## License
 
