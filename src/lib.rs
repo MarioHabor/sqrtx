@@ -1,4 +1,8 @@
-use anyhow::{bail, Result};
+mod error;
+
+pub use error::SqrtError;
+
+use anyhow::Result;
 use tokio::task;
 
 /// Computes the square root of a number asynchronously by offloading the computation to a blocking thread pool.
@@ -12,10 +16,7 @@ use tokio::task;
 pub async fn square_root_async(number: f64) -> Result<f64> {
     task::spawn_blocking(move || {
         if number < 0.0 {
-            bail!(
-                "Cannot calculate the square root of a negative number: {}",
-                number
-            );
+            return Err(SqrtError::NegativeNumber(number))?;
         }
 
         let mut guess = number / 2.0;
@@ -48,10 +49,7 @@ pub async fn square_roots_parallel(numbers: Vec<f64>) -> Result<Vec<f64>> {
             .into_iter()
             .map(|number| {
                 if number < 0.0 {
-                    bail!(
-                        "Cannot calculate the square root of a negative number: {}",
-                        number
-                    );
+                    return Err(SqrtError::NegativeNumber(number))?;
                 }
 
                 let mut guess = number / 2.0;
@@ -82,10 +80,7 @@ pub async fn square_roots_parallel(numbers: Vec<f64>) -> Result<Vec<f64>> {
 /// - `Err(anyhow::Error)` if the input number is negative.
 pub fn square_root(number: f64) -> Result<f64> {
     if number < 0.0 {
-        bail!(
-            "Cannot calculate the square root of a negative number: {}",
-            number
-        );
+        return Err(SqrtError::NegativeNumber(number))?;
     }
 
     let mut guess = number / 2.0;
@@ -115,10 +110,7 @@ pub fn square_roots_parallel_sync(numbers: Vec<f64>) -> Result<Vec<f64>> {
         .into_iter()
         .map(|number| {
             if number < 0.0 {
-                bail!(
-                    "Cannot calculate the square root of a negative number: {}",
-                    number
-                );
+                return Err(SqrtError::NegativeNumber(number))?;
             }
 
             let mut guess = number / 2.0;
@@ -155,7 +147,7 @@ mod tests {
         let rt = Runtime::new().unwrap();
         let numbers = vec![4.0, 16.0, 25.0];
         let results = rt.block_on(square_roots_parallel(numbers))?;
-        let expected = vec![2.0, 4.0, 5.0];
+        let expected = [2.0, 4.0, 5.0];
 
         for (result, &expected_value) in results.iter().zip(expected.iter()) {
             assert!((*result - expected_value).abs() < 1e-10);
@@ -205,7 +197,7 @@ mod tests_sync {
     fn test_square_roots_parallel_sync() -> Result<()> {
         let numbers = vec![4.0, 16.0, 25.0];
         let results = square_roots_parallel_sync(numbers)?;
-        let expected = vec![2.0, 4.0, 5.0];
+        let expected = [2.0, 4.0, 5.0];
 
         for (result, &expected_value) in results.iter().zip(expected.iter()) {
             assert!((*result - expected_value).abs() < 1e-10);

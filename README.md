@@ -18,7 +18,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-sqrtx = "0.1.2"
+sqrtx = "0.1.5"
 ```
 
 #### 5. **Usage**
